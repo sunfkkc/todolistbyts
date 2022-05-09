@@ -55,4 +55,4 @@ function TodoInsert({ addTodo, isLoading }: Props) {
   );
 }
 
-export default TodoInsert;
+export default React.memo(TodoInsert);
