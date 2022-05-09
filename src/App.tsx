@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Template from "./components/Template";
 import TodoInsert from "./components/TodoInsert";
@@ -22,29 +22,69 @@ function App() {
     database.save(todos);
   }, [todos]);
 
-  const addTodo = async (title: string) => {
-    //const location: any = await getLocation();
+  const addTodo = useCallback(async (title: string) => {
+    let location;
     setIsLoading(true);
+    try {
+      location = await getLocation();
+    } catch (err) {
+      location = "장소를 알 수 없습니다.";
+      setIsLoading(false);
+    }
+
     const todo: todo = {
       id: nextId.toString(),
       title,
-      location: await getLocation(),
+      location,
       checked: false,
       isChanging: false,
     };
+
     setIsLoading(false);
-    /**
-     * setTodos([...todos],todo) //오류 발생 왜??
-     */
-    const newTodos: todo[] = [];
-    setTodos(newTodos.concat(todos).concat(todo));
+    setTodos((todos) => (todos as todo[]).concat(todo));
     nextId += 1;
-  };
+  }, []);
+
+  const deleteTodo = useCallback((id: Number) => {
+    setTodos((todos) => todos.filter((todo) => todo.id !== String(id)));
+  }, []);
+
+  const clickCkb = useCallback((id: Number) => {
+    setTodos((todos) =>
+      todos.map((todo) =>
+        todo.id === String(id) ? { ...todo, checked: !todo.checked } : todo
+      )
+    );
+  }, []);
+
+  const clickChangeBtn = useCallback((id: Number) => {
+    setTodos((todos) =>
+      todos.map((todo) =>
+        todo.id === String(id)
+          ? { ...todo, isChanging: !todo.isChanging }
+          : todo
+      )
+    );
+  }, []);
+
+  const changeTodoTitle = useCallback((id: Number, title: string) => {
+    setTodos((todos) =>
+      todos.map((todo) =>
+        todo.id === String(id) ? { ...todo, title, isChanging: false } : todo
+      )
+    );
+  }, []);
 
   return (
     <Template>
       <TodoInsert addTodo={addTodo} isLoading={isLoading} />
-      <TodoList />
+      <TodoList
+        todos={todos}
+        deleteTodo={deleteTodo}
+        clickCkb={clickCkb}
+        clickChangeBtn={clickChangeBtn}
+        changeTodoTitle={changeTodoTitle}
+      />
     </Template>
   );
 }
