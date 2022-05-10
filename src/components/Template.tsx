@@ -4,6 +4,7 @@ import styled, { StyledComponent } from "styled-components";
 interface Props {
   children: JSX.Element[];
 }
+
 const TemplateBlock = styled.div`
   width: 600px;
   height: 700px;
@@ -12,6 +13,7 @@ const TemplateBlock = styled.div`
   margin-right: auto;
   margin-top: 6rem;
 `;
+
 function Template({ children }: Props) {
   return <TemplateBlock>{children}</TemplateBlock>;
 }
