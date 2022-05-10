@@ -1,32 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 import styled from "styled-components";
 
-const TodoInsertContainer = styled.div`
-  width: 600px;
-  height: 100px;
-  background: aliceblue;
-  display: flex;
-`;
-
-const TodoInsertForm = styled.form`
-  width: 500px;
-  height: 60px;
-  margin: auto;
-  display: flex;
-`;
-
-const TodoInputBox = styled.input`
-  flex: 1;
-`;
-const SubmitBtn = styled.button`
-  width: 60px;
-`;
-
-interface Props {
-  addTodo: (title: string) => void;
-  isLoading: boolean;
-}
-
 function TodoInsert({ addTodo, isLoading }: Props) {
   const [title, setTitle] = useState("");
 
@@ -56,3 +30,29 @@ function TodoInsert({ addTodo, isLoading }: Props) {
 }
 
 export default React.memo(TodoInsert);
+
+const TodoInsertContainer = styled.div`
+  width: 600px;
+  height: 100px;
+  background: aliceblue;
+  display: flex;
+`;
+
+const TodoInsertForm = styled.form`
+  width: 500px;
+  height: 60px;
+  margin: auto;
+  display: flex;
+`;
+
+const TodoInputBox = styled.input`
+  flex: 1;
+`;
+const SubmitBtn = styled.button`
+  width: 60px;
+`;
+
+interface Props {
+  addTodo: (title: string) => void;
+  isLoading: boolean;
+}
