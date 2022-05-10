@@ -1,44 +1,103 @@
-declare global {
-  interface Window {
-    kakao: any;
+const REACT_APP_KAKAO_MAPS_API_KEY = process.env.REACT_APP_KAKAO_MAPS_API_KEY;
+
+interface Region {
+  region_type: string;
+  address_name: string;
+}
+
+interface FetchDataForm {
+  meta: object;
+  documents: Region[];
+}
+
+// const somethingWrong = new Error('asdasdas');
+
+try {
+  await getGPS();
+} catch (err) {
+  if (err instanceof Error) {
+  } else if (err instanceof GeolocationPositionError) {
   }
 }
 
 function getGPS(): Promise<GeolocationCoordinates> {
-  return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition((res) => {
-      if (res) {
+  return new Promise<GeolocationCoordinates>((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (res) => {
+        // something addsa
+        // throew new Erorr()
         return resolve(res.coords);
-      } else {
-        return reject(new Error("cannot get GPS"));
+      },
+      (err) => {
+        reject(err.message);
       }
-    });
+    );
   });
 }
 
-const geocoder = new window.kakao.maps.services.Geocoder();
+// export async function getLocation(): Promise<string> {
+//   try {
+//     const gps = await getGPS();
 
-export async function getLocation(): Promise<any> {
-  try {
-    const { longitude, latitude } = await getGPS();
+//     const data = await fetchKakaoReverseApi(gps);
+//     const location = data.documents[0].address_name;
 
-    return new Promise((resolve, reject) => {
-      geocoder.coord2RegionCode(
-        longitude,
-        latitude,
-        (msg: any, status: any) => {
-          if (status === window.kakao.maps.services.Status.OK) {
-            resolve(msg[0].address_name);
-          } else {
-            reject(new Error("Bad Server"));
-          }
-        }
-      );
+//     return new Promise((resolve) => {
+//       resolve(location);
+//     });
+//   } catch (err) {
+//     return new Promise((reject) => {
+//       reject("장소를 찾을 수 없습니다");
+//     });
+//   }
+// }
+
+export async function getLocation(): Promise<string> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const gps = await getGPS();
+
+      const data = await fetchKakaoReverseApi(gps);
+      const location = data.documents[0].address_name;
+      return resolve(location);
+    } catch (err) {
+      console.error(err);
+      return resolve("장소를 찾을 수 없습니다.");
+    }
+  });
+}
+
+const fetchKakaoReverseApi = async (
+  gps: GeolocationCoordinates
+): Promise<FetchDataForm> => {
+  const { latitude, longitude } = gps;
+
+  const url = `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`;
+
+  const option = {
+    method: "get",
+    headers: {
+      Authorization: `KakaoAK ${REACT_APP_KAKAO_MAPS_API_KEY}`,
+    },
+  };
+
+  const res = await fetch(url, option);
+
+  if (res.ok) {
+    return new Promise((resolve) => {
+      resolve(res.json());
     });
-  } catch (err: any) {
-    return new Promise((resolve, reject) => {
-      console.log(err);
-      reject(new Error(err));
-    });
+  } else {
+    throw new Error("cannot get fetchdata");
+  }
+};
+
+// clean code > information, data 지양
+
+class GeolocationPositionErrorGPS extends Error {
+  constructor(err: Gel) {
+    this.message = err.message;
   }
 }
+
+throw new GeolocationPositionErrorGPS();
