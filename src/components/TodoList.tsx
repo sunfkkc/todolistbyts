@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { todo } from "../model/todoState";
 import TodoItem from "./TodoItem";
+import { TodoMethods } from "../hooks/useTodo";
 
 const TodoListBlock = styled.div`
   width: 500px;
@@ -12,31 +13,15 @@ const TodoListBlock = styled.div`
   display: block;
   overflow: auto;
 `;
-interface Props {
+interface Props extends TodoMethods {
   todos: todo[];
-  deleteTodo: (id: Number) => void;
-  clickCkb: (id: Number) => void;
-  clickChangeBtn: (id: Number) => void;
-  changeTodoTitle: (id: Number, title: string) => void;
 }
-function TodoList({
-  todos,
-  deleteTodo,
-  clickCkb,
-  clickChangeBtn,
-  changeTodoTitle,
-}: Props) {
+
+function TodoList({ todos, ...props }: Props) {
   return (
     <TodoListBlock>
       {todos.map((todo) => (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          deleteTodo={deleteTodo}
-          clickCkb={clickCkb}
-          clickChangeBtn={clickChangeBtn}
-          changeTodoTitle={changeTodoTitle}
-        />
+        <TodoItem key={todo.id} todo={todo} {...props} />
       ))}
     </TodoListBlock>
   );
