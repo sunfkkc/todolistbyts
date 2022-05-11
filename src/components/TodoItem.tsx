@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import styled from "styled-components";
 import { todo } from "../model/todoState";
-
+import { TodoMethods } from "../hooks/useTodo";
 const TodoBlock = styled.div`
   display: flex;
   .isDone {
@@ -26,21 +26,11 @@ const ChangeBtn = styled.button`
 `;
 const ChangeInputBox = styled.input``;
 
-interface Props {
+interface Props extends TodoMethods {
   todo: todo;
-  deleteTodo: (id: Number) => void;
-  clickCkb: (id: Number) => void;
-  clickChangeBtn: (id: Number) => void;
-  changeTodoTitle: (id: Number, title: string) => void;
 }
 
-function TodoItem({
-  todo,
-  deleteTodo,
-  clickCkb,
-  clickChangeBtn,
-  changeTodoTitle,
-}: Props) {
+function TodoItem({ todo, ...props }: Props) {
   const [newTitle, setNewTitle] = useState<string>(todo.title);
   const onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
     setNewTitle(evt.target.value);
@@ -51,7 +41,7 @@ function TodoItem({
         type="checkbox"
         checked={todo.checked}
         onChange={(evt) => {
-          clickCkb(Number(todo.id));
+          props.clickCkb(Number(todo.id));
         }}
       />
 
@@ -66,9 +56,9 @@ function TodoItem({
       <ChangeBtn
         onClick={(evt) => {
           if (todo.isChanging) {
-            changeTodoTitle(Number(todo.id), newTitle);
+            props.changeTodoTitle(Number(todo.id), newTitle);
           } else {
-            clickChangeBtn(Number(todo.id));
+            props.clickChangeBtn(Number(todo.id));
           }
         }}
       >
@@ -77,7 +67,7 @@ function TodoItem({
 
       <DeleteBtn
         onClick={(evt) => {
-          deleteTodo(Number(todo.id));
+          props.deleteTodo(Number(todo.id));
         }}
       >
         삭제
@@ -87,5 +77,3 @@ function TodoItem({
 }
 
 export default React.memo(TodoItem);
-{
-}
