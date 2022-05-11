@@ -6,6 +6,7 @@ import TodoList from "./components/TodoList";
 import { database } from "./model/database";
 import { todo } from "./model/todoState";
 import { getLocation } from "./model/util";
+
 function App() {
   const [todos, setTodos] = useState<todo[] | []>(database.load());
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -23,14 +24,9 @@ function App() {
   }, [todos]);
 
   const addTodo = useCallback(async (title: string) => {
-    let location;
     setIsLoading(true);
-    try {
-      location = await getLocation();
-    } catch (err) {
-      location = "장소를 알 수 없습니다.";
-      setIsLoading(false);
-    }
+
+    const location = await getLocation();
 
     const todo: todo = {
       id: nextId.toString(),
